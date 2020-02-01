@@ -1,0 +1,90 @@
+// HelloWorld
+//------------------------------------------------------------------------------
+
+// Windows Platform (VS 2017 Compiler, Windows 10 SDK)
+//------------------------------------------------------------------------------
+.VSBasePath         = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community'
+.WindowsSDKBasePath = 'C:\Program Files (x86)\Windows Kits\10'
+.VSVersion          = '14.16.27023'
+
+// Settings
+//------------------------------------------------------------------------------
+Settings
+{
+    .Environment    = { "PATH=$VSBasePath$\Common7\IDE\;$VSBasePath$\VC\Tools\MSVC\$VSVersion$\bin\Hostx64\x64\",
+                        "TMP=C:\Windows\Temp",
+                        "SystemRoot=C:\Windows" }
+}
+
+// X86 ToolChain
+//------------------------------------------------------------------------------
+.Compiler           = '$VSBasePath$\VC\Tools\MSVC\$VSVersion$\bin\Hostx64\x64\cl.exe'
+.CompilerOptions    = '"%1"'           // Input
+                    + ' /Fo"%2"'       // Output
+                    + ' /Z7'           // Debug format (in .obj)
+                    + ' /c'            // Compile only
+                    + ' /WX'           // Warnings as errors
+                    + ' /EHsc'
+.Linker             = '$VSBasePath$\VC\Tools\MSVC\$VSVersion$\bin\Hostx64\x64\link.exe'
+.LinkerOptions      = ' /OUT:"%2"'     // Output
+                    + ' "%1"'          // Input
+                    + ' /NOLOGO'       // No linker spam
+                    + ' /DEBUG'        // Keep debug info when linking
+                    + ' /NODEFAULTLIB' // We'll specify the libs explicitly
+
+// Include paths
+//------------------------------------------------------------------------------
+.BaseIncludePaths   = ' /I"./"'
+                    + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include"'
+                    + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+                    + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\VS\include"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\winrt"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\cppwinrt"'
+                    + ' /I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\Include\um"'
+                    
+.CompilerOptions    + .BaseIncludePaths
+
+// Library paths
+//------------------------------------------------------------------------------
+.LibPaths           = ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\VS\lib\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\ucrt\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\lib\um\x64"'
+                    + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\Lib\um\x64"'
+                    
+.LinkerOptions      + .LibPaths
+
+// HelloWorld
+//------------------------------------------------------------------------------
+ObjectList( 'HelloWorld-Lib' )
+{
+    .CompilerInputPath  = '\'
+    .CompilerOutputPath = 'Out\'
+}
+
+Executable( 'HelloWorld' )
+{
+    .Libraries          = { "HelloWorld-Lib" }
+    .LinkerOutput       = 'Out\HelloWorld.exe'
+    .LinkerOptions      + 'kernel32.lib'
+                        + 'user32.lib'
+                        + 'gdi32.lib'
+                        + 'winspool.lib'
+                        + 'comdlg32.lib'
+                        + 'advapi32.lib'
+                        + 'shell32.lib'
+                        + 'ole32.lib'
+                        + 'oleaut32.lib'
+                        + 'uuid.lib'
+                        + 'odbc32.lib'
+                        + 'odbccp32.lib'
+}
+
+// All
+//------------------------------------------------------------------------------
+Alias( 'all' ) { .Targets = { 'HelloWorld' } }
