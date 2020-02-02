@@ -84,7 +84,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FastBuild\main.cpp">
+    <None Include="FastBuild\texconv.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FastBuild\input\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

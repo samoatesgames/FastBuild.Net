@@ -44,7 +44,7 @@ namespace FastBuild.Net
                 throw new ArgumentException($"The FastBuild config at '{absoluteBffLocation}' is not named 'FBuild.bff'");
             }
 
-            using (var process = new AsyncProcess(new AsyncProcessStartInfo(absoluteFastBuildLocation)
+            using (var process = new AsyncProcess(new AsyncProcessStartInfo(absoluteFastBuildLocation, "-showcmds -report -verbose")
             {
                 CaptureOutputToProcessResult = ProcessOutputCaptureMode.Both,
                 WorkingDirectory = absoluteBffDirectory
