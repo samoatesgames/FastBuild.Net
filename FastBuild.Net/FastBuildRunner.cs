@@ -27,7 +27,7 @@ namespace FastBuild.Net
                 throw new FileNotFoundException($"The FastBuild application at '{absoluteFastBuildLocation}' does not exist.");
             }
 
-            var absoluteBffLocation = Path.GetFullPath(m_startInfo.FastBuildBffLocation);
+            var absoluteBffLocation = Path.GetFullPath(m_startInfo.FastBuildConfigLocation);
             if (!File.Exists(absoluteBffLocation))
             {
                 throw new FileNotFoundException($"The FastBuild config at '{absoluteBffLocation}' does not exist.");
@@ -67,9 +67,57 @@ namespace FastBuild.Net
         {
             var builder = new StringBuilder();
 
-            if (startInfo.Verbose)
+            switch (startInfo.CacheMode)
             {
-                builder.Append("-verbose ");
+                case CacheModeEnum.Read:
+                    builder.Append("-cacheread ");
+                    break;
+                case CacheModeEnum.Write:
+                    builder.Append("-cachewrite ");
+                    break;
+                case CacheModeEnum.ReadWrite:
+                    builder.Append("-cache ");
+                    break;
+            }
+
+            if (startInfo.CacheInfo)
+            {
+                builder.Append("-cacheinfo ");
+            }
+
+            if (startInfo.CacheTrimSize != 0)
+            {
+                builder.AppendFormat("-cachetrim {0} ", startInfo.CacheTrimSize);
+            }
+
+            if (startInfo.VerboseCache)
+            {
+                builder.Append("-cacheverbose ");
+            }
+
+            if (startInfo.Clean)
+            {
+                builder.Append("-clean ");
+            }
+
+            if (startInfo.CompareDatabase)
+            {
+                builder.Append("-compdb ");
+            }
+
+            if (startInfo.DistributedCompiling)
+            {
+                builder.Append("-dist ");
+            }
+
+            if (startInfo.VerboseDistribution)
+            {
+                builder.Append("-distverbose ");
+            }
+
+            if (startInfo.ForceRemoteWorker)
+            {
+                builder.Append("-forceremote ");
             }
 
             if (startInfo.GenerateReport)
@@ -82,9 +130,24 @@ namespace FastBuild.Net
                 builder.Append("-showcmds ");
             }
 
-            if (startInfo.ShowDependencies)
+            if (startInfo.ShowTargets)
             {
-                builder.Append("-showdeps ");
+                builder.Append("-showtargets ");
+            }
+
+            if (startInfo.ShowAllTargets)
+            {
+                builder.Append("-showalltargets ");
+            }
+
+            if (startInfo.Summary)
+            {
+                builder.Append("-summary ");
+            }
+
+            if (startInfo.Verbose)
+            {
+                builder.Append("-verbose ");
             }
 
             return builder.ToString();
