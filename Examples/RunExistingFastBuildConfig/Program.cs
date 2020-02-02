@@ -11,7 +11,9 @@ namespace RunExistingFastBuildConfig
             var startInfo = new FastBuildStartInfo
             {
                 FastBuildExecutableLocation = "../../../../../External/FastBuild/0.99/FBuild.exe",
-                FastBuildBffLocation = "FastBuild/FBuild.bff"
+                FastBuildBffLocation = "FastBuild/FBuild.bff",
+                ShowCommands = true,
+                Verbose = true
             };
 
             try

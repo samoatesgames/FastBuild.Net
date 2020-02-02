@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using SamOatesGames.System;
 
@@ -44,7 +45,9 @@ namespace FastBuild.Net
                 throw new ArgumentException($"The FastBuild config at '{absoluteBffLocation}' is not named 'FBuild.bff'");
             }
 
-            using (var process = new AsyncProcess(new AsyncProcessStartInfo(absoluteFastBuildLocation, "-showcmds -report -verbose")
+            var arguments = GenerateCommandLineArguments(m_startInfo);
+
+            using (var process = new AsyncProcess(new AsyncProcessStartInfo(absoluteFastBuildLocation, arguments)
             {
                 CaptureOutputToProcessResult = ProcessOutputCaptureMode.Both,
                 WorkingDirectory = absoluteBffDirectory
@@ -58,6 +61,33 @@ namespace FastBuild.Net
                         result);
                 }
             }
+        }
+
+        private string GenerateCommandLineArguments(FastBuildStartInfo startInfo)
+        {
+            var builder = new StringBuilder();
+
+            if (startInfo.Verbose)
+            {
+                builder.Append("-verbose ");
+            }
+
+            if (startInfo.GenerateReport)
+            {
+                builder.Append("-report ");
+            }
+
+            if (startInfo.ShowCommands)
+            {
+                builder.Append("-showcmds ");
+            }
+
+            if (startInfo.ShowDependencies)
+            {
+                builder.Append("-showdeps ");
+            }
+
+            return builder.ToString();
         }
     }
 }
