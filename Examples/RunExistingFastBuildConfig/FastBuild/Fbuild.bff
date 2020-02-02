@@ -11,8 +11,8 @@ Compiler( 'texconv' )
 ObjectList( 'DXT5.compression' )
 {
   .Compiler                     = 'texconv'
-  .CompilerOptions              = '-f DXT5 -of %2 %1'
-  .CompilerOutputPath           = '.\'
+  .CompilerOptions              = '-f DXT5 -o "%2" "%1"'
+  .CompilerOutputPath           = 'output'
   .CompilerOutputExtension      = '.dds'
   
   .CompilerInputPath            = 'input'
