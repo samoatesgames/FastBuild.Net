@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Examples", "0 - Example
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunExistingFastBuildConfig", "Examples\RunExistingFastBuildConfig\RunExistingFastBuildConfig.csproj", "{4BC90B47-7EE5-4982-AF4D-0676A49E5839}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateFastBuildConfig", "Examples\GenerateFastBuildConfig\GenerateFastBuildConfig.csproj", "{3309DDCF-056B-4CC8-9902-1C7AF0F57863}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -33,12 +35,21 @@ Global
 		{4BC90B47-7EE5-4982-AF4D-0676A49E5839}.Release|x64.Build.0 = Release|x64
 		{4BC90B47-7EE5-4982-AF4D-0676A49E5839}.Release|x86.ActiveCfg = Release|x86
 		{4BC90B47-7EE5-4982-AF4D-0676A49E5839}.Release|x86.Build.0 = Release|x86
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Debug|x64.ActiveCfg = Debug|x64
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Debug|x64.Build.0 = Debug|x64
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Debug|x86.ActiveCfg = Debug|x86
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Debug|x86.Build.0 = Debug|x86
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Release|x64.ActiveCfg = Release|x64
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Release|x64.Build.0 = Release|x64
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Release|x86.ActiveCfg = Release|x86
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4BC90B47-7EE5-4982-AF4D-0676A49E5839} = {83BF7787-ABF6-4088-A0EB-9907E3C77C7B}
+		{3309DDCF-056B-4CC8-9902-1C7AF0F57863} = {83BF7787-ABF6-4088-A0EB-9907E3C77C7B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {275A5096-6945-415F-A542-921927F4A942}

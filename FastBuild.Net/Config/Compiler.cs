@@ -1,0 +1,172 @@
+﻿using System.IO;
+using System.Linq;
+
+namespace FastBuild.Net.Config
+{
+    public class Compiler : IConfigBlock
+    {
+        public enum CompilerFamilyEnum
+        {
+            Auto,
+            MSVC,
+            Clang,
+            GCC,
+            SNC,
+            CodeWarriorWii,
+            GreenHillsWiiU,
+            CudaNvcc,
+            QtRcc,
+            VBCC,
+            OrbisWavePsslc,
+            Custom
+        }
+
+        /// <summary>
+        /// The name of the compiler instance
+        /// </summary>
+        public string Alias { get; }
+
+        /// <summary>
+        /// Required
+        /// The primary compiler executable that will be invoked
+        /// by FASTBuild when this Compiler() is used.
+        /// </summary>
+        public string Executable { get; set; } = string.Empty;
+
+        /// <summary>
+        /// For distributed compilation, the specified files will also be
+        /// synchronized to the remote machine. The relative location of
+        /// the source files controls how they will be mirrored on the remote
+        /// machine. Files in 'ExtraFiles' in the same directory or in
+        /// sub-directories under the primary 'Executable' will be placed
+        /// in the same relative location on the remote machine. 'ExtraFiles'
+        /// in other folders will be placed at the same level as the executable. 
+        /// </summary>
+        public string[] ExtraFiles { get; set; } = new string[0];
+
+        /// <summary>
+        /// By default, FASTBuild will detect the compiler type based on the executable name.
+        /// The .CompilerFamily property allows you to explicitly control the compiler type instead.
+        /// This can be useful for:
+        ///  * custom variants of compilers with unique naming
+        ///  * custom executables used as compilers
+        /// </summary>
+        public CompilerFamilyEnum CompilerFamily { get; set; } = CompilerFamilyEnum.Auto;
+
+        /// <summary>
+        /// For compilers where distributed compilation is supported, said feature can be disabled.
+        /// </summary>
+        public bool AllowDistribution { get; set; } = true;
+
+        /// <summary>
+        /// When a compiler is distributed the .Compiler and .ExtraFiles hierarchy is
+        /// replicated on the remote machine as documented above (see .ExtraFiles).
+        /// The base path for this replication can be overridden by setting the
+        /// .ExecutableRootPath property, allowing more flexibility in how the file hierarchy
+        /// is replicated on the remote host.
+        /// </summary>
+        public string ExecutableRootPath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// FASTbuild supports distributed compilation for certain compilers that it explicitly
+        /// understands how to interact with in order to obtain dependency information
+        /// (in addition to the simple primary input file). By setting .SimpleDistributionMode,
+        /// FASTBuild can be told that the single file input of a "compiler" is the only dependency
+        /// and thus can be safely used with distributed compilation. This allows distribution of
+        /// custom tools or other useful work like texture conversion.
+        /// </summary>
+        public bool SimpleDistributionMode { get; set; } = true;
+
+        /// <summary>
+        /// When compiling on a remote host, a clean environment is used. If needed,
+        /// environment variables can be set.
+        /// </summary>
+        public string[] CustomEnvironmentVariables { get; set; } = new string[0];
+
+        /// <summary>
+        /// FASTBuild uses the -E preprocessor option when compiling with Clang to
+        /// preprocess the source code. In order to improve consistency between this
+        /// preprocessed source and the original source, FASTBuild also uses the
+        /// -frewrite-includes option by default. An example of this improved
+        /// consistency is that compiler errors originating from macros will have
+        /// the caret point to the correct column location of the source code instead
+        /// of the column location where the error would be in the expanded macro.
+        /// </summary>
+        public bool ClangRewriteIncludes { get; set; } = true;
+
+        /// <summary>
+        /// An issue exists in the Visual Studio 2012 compiler whereby enums in preprocessed
+        /// code are sometimes incorrectly processed when they lie on specific buffer
+        /// alignment boundaries. This issue is fixed in Visual Studio 2013 and later.
+        /// </summary>
+        public bool VS2012EnumBugFix { get; set; } = false;
+
+        /// <summary>
+        /// When set, overrides the environment for local compiles
+        /// This allows you to have a different environment per compiler
+        /// </summary>
+        public string[] Environment { get; set; } = new string[0];
+
+        /// <summary>
+        /// When set, activates "Light Caching" mode. Light Caching mode
+        /// avoids using the compiler's preprocessor for cache lookups,
+        /// instead allowing FASTBuild to parse the files itself to gather
+        /// the required information. This parsing is significantly faster than
+        /// for each file and additionally allows FASTBuild to eliminate
+        /// redundant file parsing between object files, further accelerating cache lookups. 
+        /// </summary>
+        public bool UseLightCache_Experimental { get; set; } = false;
+
+        /// <summary>
+        /// A compiler block
+        /// See: https://fastbuild.org/docs/functions/compiler.html
+        /// </summary>
+        /// <param name="alias">The name of the compiler block</param>
+        public Compiler(string alias)
+        {
+            Alias = alias;
+        }
+
+        public void Serialize(StreamWriter outputStream)
+        {
+            outputStream.WriteLine($"Compiler( '{Alias}' )");
+            outputStream.WriteLine("{");
+            outputStream.WriteLine($"  .Executable = '{Executable}'");
+            outputStream.WriteLine($"  .ExtraFiles = {{ {string.Join(", ", ExtraFiles.Select(x => $"'{x}'"))} }}");
+            outputStream.WriteLine($"  .CompilerFamily = '{FormatCompilerFamily()}'");
+            outputStream.WriteLine($"  .AllowDistribution = {AllowDistribution.ToString().ToLower()}");
+            outputStream.WriteLine($"  .ExecutableRootPath = '{ExecutableRootPath}'");
+            outputStream.WriteLine($"  .SimpleDistributionMode = {SimpleDistributionMode.ToString().ToLower()}");
+            outputStream.WriteLine($"  .CustomEnvironmentVariables = {{ {string.Join(", ", CustomEnvironmentVariables.Select(x => $"'{x}'"))} }}");
+            outputStream.WriteLine($"  .ClangRewriteIncludes = {ClangRewriteIncludes.ToString().ToLower()}");
+            outputStream.WriteLine($"  .VS2012EnumBugFix = {VS2012EnumBugFix.ToString().ToLower()}");
+            outputStream.WriteLine($"  .Environment = {{ {string.Join(", ", Environment.Select(x => $"'{x}'"))} }}");
+            outputStream.WriteLine($"  .UseLightCache_Experimental = {UseLightCache_Experimental.ToString().ToLower()}");
+            outputStream.WriteLine("}");
+        }
+
+        public void Deserialize(StreamReader inputStream)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private string FormatCompilerFamily()
+        {
+            switch (CompilerFamily)
+            {
+                case CompilerFamilyEnum.CodeWarriorWii:
+                    return "codewarrior-wii";
+                case CompilerFamilyEnum.GreenHillsWiiU:
+                    return "greenhills-wiiu";
+                case CompilerFamilyEnum.CudaNvcc:
+                    return "cuda-nvcc";
+                case CompilerFamilyEnum.QtRcc:
+                    return "qt-rcc";
+                case CompilerFamilyEnum.OrbisWavePsslc:
+                    return "orbis-wave-psslc";
+                default:
+                    return CompilerFamily.ToString().ToLower();
+            }
+        }
+    }
+}
