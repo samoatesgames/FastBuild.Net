@@ -9,15 +9,7 @@ namespace RunExistingFastBuildConfig
     {
         public static async Task Main(string[] args)
         {
-            if (Directory.Exists("FastBuild/output/"))
-            {
-                foreach (var file in Directory.EnumerateFiles("FastBuild/output/"))
-                {
-                    File.Delete(file);
-                }
-            }
-
-            SetupTestData("FastBuild/input/logo.png", 1000);
+            SetupTestData(10);
 
             var startInfo = new FastBuildStartInfo
             {
@@ -25,12 +17,18 @@ namespace RunExistingFastBuildConfig
                 FastBuildConfigLocation = "FastBuild/FBuild.bff",
                 ShowCommands = true,
                 Verbose = true,
-                GenerateReport = true
+                GenerateReport = true,
+                DistributedCompiling = true,
+                VerboseDistribution = true
             };
 
             try
             {
-                using (var fastBuild = new FastBuildRunner(startInfo))
+                Console.WriteLine("Starting FastBuild runner...");
+                using (var fastBuild = new FastBuildRunner(startInfo, (outputType, output) =>
+                {
+                    Console.WriteLine($"[{outputType}] {output}");
+                }))
                 {
                     await fastBuild.Run();
                 }
@@ -50,14 +48,37 @@ namespace RunExistingFastBuildConfig
             Console.ReadLine();
         }
 
-        private static void SetupTestData(string sourceImageLocation, int imageCount)
+        private static void SetupTestData(int imageCount)
         {
-            var sourceImagePath = Path.GetFullPath(sourceImageLocation);
+            Console.WriteLine("Generating test data...");
+
+            if (Directory.Exists("FastBuild/output/"))
+            {
+                foreach (var file in Directory.EnumerateFiles("FastBuild/output/"))
+                {
+                    File.Delete(file);
+                }
+            }
+
+            var sourceImagePath = Path.GetFullPath("FastBuild/input/logo.png");
             if (!File.Exists(sourceImagePath))
             {
                 Console.WriteLine($"Failed to find the source input image '{sourceImagePath}'");
                 Console.ReadLine();
                 return;
+            }
+
+            if (Directory.Exists("FastBuild/input/"))
+            {
+                foreach (var file in Directory.EnumerateFiles("FastBuild/input/"))
+                {
+                    if (file == "FastBuild/input/logo.png")
+                    {
+                        continue;
+                    }
+
+                    File.Delete(file);
+                }
             }
 
             var sourceDirectory = Path.GetDirectoryName(sourceImagePath);
@@ -71,9 +92,9 @@ namespace RunExistingFastBuildConfig
                 return;
             }
 
-            for (var i = 0; i < imageCount; ++i)
+            for (var i = 1; i < imageCount; ++i)
             {
-                var targetPath = Path.Combine(sourceDirectory, $"{sourceNoExtension}-{i}.{sourceExtension}");
+                var targetPath = Path.Combine(sourceDirectory, $"{sourceNoExtension}-{i}{sourceExtension}");
                 File.Copy(sourceImagePath, targetPath, true);
             }
         }

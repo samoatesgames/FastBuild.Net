@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using SamOatesGames.System;
 
@@ -8,11 +9,23 @@ namespace FastBuild.Net
 {
     public class FastBuildRunner : IDisposable
     {
-        private readonly FastBuildStartInfo m_startInfo;
+        public enum OutputType
+        {
+            Information,
+            Error
+        }
 
-        public FastBuildRunner(FastBuildStartInfo startInfo)
+        private readonly FastBuildStartInfo m_startInfo;
+        private readonly Action<OutputType, string> m_outputCallbackAction;
+
+        public FastBuildRunner(FastBuildStartInfo startInfo, Action<OutputType, string> outputCallbackAction)
         {
             m_startInfo = startInfo;
+            m_outputCallbackAction = outputCallbackAction;
+        }
+
+        public FastBuildRunner(FastBuildStartInfo startInfo) : this(startInfo, null)
+        {
         }
 
         public void Dispose()
@@ -20,6 +33,11 @@ namespace FastBuild.Net
         }
 
         public async Task Run()
+        {
+            await Run(CancellationToken.None);
+        }
+
+        public async Task Run(CancellationToken cancellationToken)
         {
             var absoluteFastBuildLocation = Path.GetFullPath(m_startInfo.FastBuildExecutableLocation);
             if (!File.Exists(absoluteFastBuildLocation))
@@ -47,11 +65,19 @@ namespace FastBuild.Net
 
             var arguments = GenerateCommandLineArguments(m_startInfo);
 
-            using (var process = new AsyncProcess(new AsyncProcessStartInfo(absoluteFastBuildLocation, arguments)
+            var startInfo = new AsyncProcessStartInfo(absoluteFastBuildLocation, arguments)
             {
                 CaptureOutputToProcessResult = ProcessOutputCaptureMode.Both,
                 WorkingDirectory = absoluteBffDirectory
-            }))
+            };
+
+            if (m_outputCallbackAction != null)
+            {
+                startInfo.OnStandardOutputReceived += x => m_outputCallbackAction(OutputType.Information, x);
+                startInfo.OnStandardErrorReceived += x => m_outputCallbackAction(OutputType.Error, x);
+            }
+
+            using (var process = new AsyncProcess(startInfo, cancellationToken))
             {
                 var result = await process.Run();
                 if (result.ExitCode != 0)
