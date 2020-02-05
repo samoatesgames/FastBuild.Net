@@ -10,12 +10,18 @@ namespace GenerateFastBuildConfig
         {
 
             var config = new FastBuildConfig();
-            config.Add(new Compiler("texconv")
+
+            config.TryAdd(new Compiler("texconv")
             {
                 Executable = "texconv.exe",
                 CompilerFamily = Compiler.CompilerFamilyEnum.Custom,
                 AllowDistribution = true,
                 SimpleDistributionMode = true
+            });
+
+            config.TryAdd(new Alias("all")
+            {
+                Targets = new [] { "DXT5.compression" }
             });
 
             config.Save("FBuild.bff");

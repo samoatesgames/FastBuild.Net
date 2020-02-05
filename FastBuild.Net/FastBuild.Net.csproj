@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Alias.cs" />
     <Compile Include="Config\Compiler.cs" />
     <Compile Include="Config\IConfigBlock.cs" />
     <Compile Include="FastBuildConfig.cs" />
