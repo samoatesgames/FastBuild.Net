@@ -17,14 +17,15 @@ namespace FastBuild.Net
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public void Save(string filePath)
+        public void SaveToFolder(string folderPath)
         {
             using (var memoryStream = new MemoryStream())
             {
                 using (var writer = new StreamWriter(memoryStream, Encoding.UTF8, 4096, true))
                 {
-                    writer.WriteLine("");
+                    writer.WriteLine("//-----------------------------//");
                     writer.WriteLine("// This file is auto-generated //");
+                    writer.WriteLine("//-----------------------------//");
                     writer.WriteLine("");
                     foreach (var configBlock in m_configBlocks)
                     {
@@ -32,6 +33,8 @@ namespace FastBuild.Net
                         writer.WriteLine("");
                     }
                 }
+
+                var filePath = Path.Combine(folderPath, "FBuild.bff");
 
                 memoryStream.Position = 0;
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))

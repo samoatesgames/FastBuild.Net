@@ -24,7 +24,7 @@ namespace GenerateFastBuildConfig
                 Targets = new [] { "DXT5.compression" }
             });
 
-            config.Save("FBuild.bff");
+            config.SaveToFolder("./");
         }
     }
 }
