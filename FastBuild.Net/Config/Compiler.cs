@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace FastBuild.Net.Config
@@ -20,6 +21,8 @@ namespace FastBuild.Net.Config
             OrbisWavePsslc,
             Custom
         }
+
+        private static readonly Compiler s_default = new Compiler(null);
 
         /// <summary>
         /// The name of the compiler instance
@@ -131,17 +134,17 @@ namespace FastBuild.Net.Config
         {
             outputStream.WriteLine($"Compiler( '{Alias}' )");
             outputStream.WriteLine("{");
-            outputStream.WriteLine($"  .Executable = '{Executable}'");
-            outputStream.WriteLine($"  .ExtraFiles = {{ {string.Join(", ", ExtraFiles.Select(x => $"'{x}'"))} }}");
-            outputStream.WriteLine($"  .CompilerFamily = '{FormatCompilerFamily()}'");
-            outputStream.WriteLine($"  .AllowDistribution = {AllowDistribution.ToString().ToLower()}");
-            outputStream.WriteLine($"  .ExecutableRootPath = '{ExecutableRootPath}'");
-            outputStream.WriteLine($"  .SimpleDistributionMode = {SimpleDistributionMode.ToString().ToLower()}");
-            outputStream.WriteLine($"  .CustomEnvironmentVariables = {{ {string.Join(", ", CustomEnvironmentVariables.Select(x => $"'{x}'"))} }}");
-            outputStream.WriteLine($"  .ClangRewriteIncludes = {ClangRewriteIncludes.ToString().ToLower()}");
-            outputStream.WriteLine($"  .VS2012EnumBugFix = {VS2012EnumBugFix.ToString().ToLower()}");
-            outputStream.WriteLine($"  .Environment = {{ {string.Join(", ", Environment.Select(x => $"'{x}'"))} }}");
-            outputStream.WriteLine($"  .UseLightCache_Experimental = {UseLightCache_Experimental.ToString().ToLower()}");
+            outputStream.WriteIfNoneDefault(v => $"  .Executable = '{v.Executable}'", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .ExtraFiles = {{ {string.Join(", ", v.ExtraFiles.Select(x => $"'{x}'"))} }}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .CompilerFamily = '{FormatCompilerFamily(v.CompilerFamily)}'", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .AllowDistribution = {v.AllowDistribution.ToString().ToLower()}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .ExecutableRootPath = '{v.ExecutableRootPath}'", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .SimpleDistributionMode = {v.SimpleDistributionMode.ToString().ToLower()}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .CustomEnvironmentVariables = {{ {string.Join(", ", v.CustomEnvironmentVariables.Select(x => $"'{x}'"))} }}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .ClangRewriteIncludes = {v.ClangRewriteIncludes.ToString().ToLower()}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .VS2012EnumBugFix = {v.VS2012EnumBugFix.ToString().ToLower()}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .Environment = {{ {string.Join(", ", v.Environment.Select(x => $"'{x}'"))} }}", this, s_default);
+            outputStream.WriteIfNoneDefault(v => $"  .UseLightCache_Experimental = {v.UseLightCache_Experimental.ToString().ToLower()}", this, s_default);
             outputStream.WriteLine("}");
         }
 
@@ -150,9 +153,9 @@ namespace FastBuild.Net.Config
             throw new System.NotImplementedException();
         }
 
-        private string FormatCompilerFamily()
+        private string FormatCompilerFamily(CompilerFamilyEnum compilerFamily)
         {
-            switch (CompilerFamily)
+            switch (compilerFamily)
             {
                 case CompilerFamilyEnum.CodeWarriorWii:
                     return "codewarrior-wii";
@@ -165,7 +168,7 @@ namespace FastBuild.Net.Config
                 case CompilerFamilyEnum.OrbisWavePsslc:
                     return "orbis-wave-psslc";
                 default:
-                    return CompilerFamily.ToString().ToLower();
+                    return compilerFamily.ToString().ToLower();
             }
         }
     }
